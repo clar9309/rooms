@@ -1,0 +1,8 @@
+{
+  "env": {
+    "PRISMA_CLI_QUERY_ENGINE_TYPE": "query-engine",
+    "PRISMA_QUERY_ENGINE_VERSION": "1.18.0",
+    "PRISMA_MIGRATION_ENGINE_TYPE": "migration-engine",
+    "PRISMA_MIGRATION_ENGINE_VERSION": "1.18.0"
+  }
+}

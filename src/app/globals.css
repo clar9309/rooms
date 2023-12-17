@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --fc-event-bg-color: #1f1f21;
+  --fc-event-border-color: #1f1f21;
+  --tw-ring-color: #1f1f21;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(50%);
+}
+
+select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+select,
+select option {
+  font-family: var(--body-font);
+}
+
+input[type="checkbox"] {
+  accent-color: #946a2b;
+}
+
+.primary-btn {
+  @apply transition ease-in-out duration-300 flex items-center justify-center rounded-full border bg-white border-white text-bg_black px-3 py-3 enabled:hover:bg-opacity-0 enabled:hover:text-white;
+}
+
+.secondary-btn {
+  @apply transition ease-in-out duration-300 flex items-center justify-center rounded-full border border-white px-3 py-3 enabled:hover:bg-white enabled:hover:text-bg_black;
+}
+
+.fc-view {
+  @apply w-full h-full lg:h-3/4 xl:h-2/3;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  @apply bg-white bg-opacity-0;
+}
+
+.fc-daygrid-dot-event .fc-event-title {
+  @apply font-normal overflow-ellipsis;
+}
+
+.fc-direction-ltr .fc-daygrid-event .fc-event-time {
+  @apply font-medium text-xs mr-2;
+}
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  @apply bg-calendar-red rounded-full w-8 h-8 flex justify-center items-center mt-1 mr-1;
+}
+
+a.fc-event:hover {
+  @apply bg-white bg-opacity-10 rounded-sm;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  @apply border-grey border-l-0 border-t-0;
+}
+
+.fc-theme-standard td {
+  @apply border-grey cursor-pointer;
+}
+
+.fc-theme-standard th {
+  @apply border-grey border border-r-0 border-l-0 text-right font-normal;
+}
+.fc-scrollgrid-section > * {
+  @apply border-l !important;
+}
+.fc .fc-scrollgrid-section-footer > *,
+.fc .fc-scrollgrid-section-header > * {
+  @apply border-none;
+}
+
+.fc .fc-toolbar {
+  @apply flex-wrap;
+}
+
+.fc .fc-toolbar-title {
+  @apply text-h2 md:text-h1 mb-4 md:mb-14 mt-7;
+}
+.fc .fc-button-group {
+  @apply gap-1;
+}
+
+.fc .fc-button-primary {
+  @apply bg-primary border-none ring-0 outline-none !important;
+}
+.fc .fc-button-primary:hover {
+  @apply bg-primary bg-opacity-80 transition border-none ring-0 outline-none !important;
+}
+.fc .fc-button-primary:disabled {
+  @apply bg-primary border-none ring-0 outline-none !important;
+}
+
+.fc .fc-button-primary:active {
+  @apply bg-primary border-none ring-0 outline-none !important;
+}
+
+.fc .fc-button .fc-icon {
+  @apply text-base flex justify-center items-center;
+}

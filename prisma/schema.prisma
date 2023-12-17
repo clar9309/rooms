@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Room {
+  id           String        @id @default(cuid())
+  title        String
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  admin_fk     String
+  location     Location?   @relation(fields: [location_id], references: [id])
+  location_id  Float?
+  participants Participant[]   // Define the many-to-many relationship
+  cover        Cover?       @relation("RoomCover", fields: [cover_id], references: [id])
+  cover_id     String?      @unique
+  admin        User          @relation(fields: [admin_fk], references: [id])
+  task_widget  TaskWidget?
+  note_widget  NoteWidget?
+  events       Event[]
+}
+
+model Cover {
+  id                   String @id @default(cuid())
+  formatted_url        String
+  cloudinary_public_id String
+  room                 Room?  @relation("RoomCover")
+}
+
+model Location {
+  id            Float            @unique 
+  latitude      Float
+  longitude     Float
+  country       String?
+  city          String?
+  state         String?
+  rooms         Room[]
+
+  @@unique([latitude, longitude])
+}
+
+model Participant {
+  id            String   @id @default(cuid())
+  user_id       String
+  room_id       String
+  is_favourited Boolean
+  created_at    DateTime @default(now())
+  visited_at    DateTime @default(now())
+  room          Room     @relation(fields: [room_id], references: [id])
+  user          User     @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, room_id])
+}
+
+model Status {
+  id    String @id @default(cuid())
+  title String @unique
+  users User[]
+}
+
+model User {
+  id                  String      @default(cuid()) @id
+  first_name          String
+  last_name           String
+  email               String      @unique
+  email_verified_at   DateTime?
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @default(now())
+  password            String 
+  birthday            String 
+  avatar              Avatar?     @relation("UserAvatar", fields: [avatar_id], references: [id])
+  avatar_id            String?     @unique
+  status              Status      @relation(fields: [status_fk], references: [id]) 
+  status_fk           String
+  rooms               Room[]     //many-to-many 
+  created_tasks       TaskItem[]
+  participants        Participant[]  //defining opposite relation
+  receivedNotifications  Notification[]   @relation("Receiver")
+  triggeredNotifications Notification[]   @relation("Triggerer")
+  created_events      Event[]
+  eventsAttending     EventAttendee[]
+
+  @@map(name: "users") 
+}
+
+model Avatar {
+  id                   String @id @default(cuid())
+  formatted_url        String
+  cloudinary_public_id String
+  user                 User?  @relation("UserAvatar")
+}
+
+model Notification {
+  id               String   @id @default(cuid())
+  created_at       DateTime @default(now())
+  read             Boolean
+  user_id          String
+  meta_user_id     String
+  meta_action      String
+  meta_target      String
+  meta_target_name String
+  meta_link        String?
+  meta_user        User     @relation("Triggerer", fields: [meta_user_id], references: [id])
+  user             User     @relation("Receiver", fields: [user_id], references: [id])
+}
+
+model TaskWidget {
+  id        String     @id @default(cuid())
+  room_fk   String     @unique
+  task_item TaskItem[]
+  room      Room       @relation(fields: [room_fk], references: [id])
+}
+
+model TaskItem {
+  id             String     @id @default(cuid())
+  text           String
+  task_widget_fk String
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @default(now())
+  order          Int
+  checked        Boolean
+  updated_by     String?
+  created_by     User       @relation(fields: [created_by_fk], references: [id])
+  created_by_fk  String
+  task_widget    TaskWidget @relation(fields: [task_widget_fk], references: [id])
+}
+
+model NoteWidget {
+  id        String     @id @default(cuid())
+  room_fk   String     @unique
+  note_item NoteItem[]
+  room      Room       @relation(fields: [room_fk], references: [id])
+
+  @@unique([id, room_fk])
+}
+
+model NoteItem {
+  id                 String         @id @default(cuid())
+  title              String
+  text               String
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @default(now())
+  note_widget_fk     String
+  text_format_fk     String?
+  title_format_fk    String?
+  text_alignment_fk  String?
+  title_alignment_fk String?
+  note_widget        NoteWidget     @relation(fields: [note_widget_fk], references: [id])
+  text_alignment     NoteAlignment? @relation("Text", fields: [text_alignment_fk], references: [id])
+  text_format        NoteFormat?    @relation("Text", fields: [text_format_fk], references: [id])
+  title_alignment    NoteAlignment? @relation("Title", fields: [title_alignment_fk], references: [id])
+  title_format       NoteFormat?    @relation("Title", fields: [title_format_fk], references: [id])
+}
+
+model NoteFormat {
+  id           String     @id @default(cuid())
+  formatting   String
+  text_format  NoteItem[] @relation("Text")
+  title_format NoteItem[] @relation("Title")
+}
+
+model NoteAlignment {
+  id              String     @id @default(cuid())
+  alignment       String
+  text_alignment  NoteItem[] @relation("Text")
+  title_alignment NoteItem[] @relation("Title")
+}
+
+model Event {
+  id                String         @default(cuid()) @id
+  title             String
+  start_time        DateTime
+  end_time          DateTime?
+  all_day           Boolean
+  location          String?
+  description       String?
+  admin             User           @relation(fields: [admin_fk], references: [id])
+  admin_fk          String
+  room              Room           @relation(fields: [room_id], references: [id]) 
+  room_id           String
+  attendees         EventAttendee[]
+}
+
+model EventAttendee {
+  user      User     @relation(fields: [user_id], references: [id])
+  user_id   String
+  event     Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event_id  String
+  reply     String //accepted, declined, pending
+  @@id([user_id, event_id])
+}
